@@ -3,6 +3,9 @@ using System.Collections;
 
 public class PrototypeHeroDemo : MonoBehaviour {
 
+    [Header("Двигать")]
+    public bool isRun;
+
     [Header("Variables")]
     [SerializeField] float      m_maxSpeed = 4.5f;
     [SerializeField] float      m_jumpForce = 7.5f;
@@ -12,16 +15,19 @@ public class PrototypeHeroDemo : MonoBehaviour {
     [SerializeField] GameObject m_JumpDust;
     [SerializeField] GameObject m_LandingDust;
 
+    [SerializeField] EnvironmentGenerator environmentGenerator;
+
     private Animator            m_animator;
     private Rigidbody2D         m_body2d;
     private Sensor_Prototype    m_groundSensor;
-    private SensorObstacle m_obstacleSensor;
+    private SensorObstacle      m_obstacleSensor;
     private AudioSource         m_audioSource;
     private AudioManager_PrototypeHero m_audioManager;
     private bool                m_grounded = false;
     private bool                m_moving = false;
     private int                 m_facingDirection = 1;
     private float               m_disableMovementTimer = 0.0f;
+
 
     // Use this for initialization
     void Start ()
@@ -33,6 +39,7 @@ public class PrototypeHeroDemo : MonoBehaviour {
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_Prototype>();
         m_obstacleSensor = transform.Find("ObstacleSensor").GetComponent<SensorObstacle>();
     }
+
 
     // Update is called once per frame
     void Update ()
@@ -60,28 +67,51 @@ public class PrototypeHeroDemo : MonoBehaviour {
         if (m_disableMovementTimer < 0.0f)
             inputX = Input.GetAxis("Horizontal");
 
-        // GetAxisRaw returns either -1, 0 or 1
+        //GetAxisRaw returns either -1, 0 or 1
         float inputRaw = Input.GetAxisRaw("Horizontal");
         // Check if current move input is larger than 0 and the move direction is equal to the characters facing direction
         if (Mathf.Abs(inputRaw) > Mathf.Epsilon && Mathf.Sign(inputRaw) == m_facingDirection)
+        {
             m_moving = true;
+        }
 
         else
             m_moving = false;
 
+        m_moving = isRun;
+
+        if(m_obstacleSensor.State())
+        {
+            isRun =false;
+            environmentGenerator.isRun = false;
+            print("GAME OVER");
+        }
+
         // Swap direction of sprite depending on move direction
-        if (inputRaw > 0)
-        {
-            GetComponent<SpriteRenderer>().flipX = false;
-            m_facingDirection = 1;
-        }
-            
-        else if (inputRaw < 0)
-        {
-            GetComponent<SpriteRenderer>().flipX = true;
-            m_facingDirection = -1;
-        }
-     
+        //if (inputRaw > 0)
+        //{
+        //    GetComponent<SpriteRenderer>().flipX = false;
+        //    m_facingDirection = 1;
+
+        //    GameObject[] environments = GameObject.FindGameObjectsWithTag("Environment");
+
+        //    foreach (var env in environments)
+        //    {
+        //        Vector3 vector = new Vector3(env.transform.position.x, env.transform.position.y, env.transform.position.z);
+        //        vector = new Vector3(vector.x - m_envSpeed, vector.y, vector.z);
+        //        env.transform.position = Vector3.Lerp(env.transform.position, vector, m_envSpeed * Time.deltaTime);
+        //    }
+        //    GameObject obj = environments[environments.Length - 1];
+        //    Instantiate(obj, new Vector3(obj.transform.position.x + 12, obj.transform.position.y, obj.transform.position.z), Quaternion.identity);
+        //    Destroy(environments[0]);
+        //}
+
+        //else if (inputRaw < 0)
+        //{
+        //    GetComponent<SpriteRenderer>().flipX = true;
+        //    m_facingDirection = -1;
+        //}
+
         // SlowDownSpeed helps decelerate the characters when stopping
         float SlowDownSpeed = m_moving ? 1.0f : 0.5f;
         // Set movement
