@@ -1,10 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PrototypeHeroDemo : MonoBehaviour {
+public class Player : MonoBehaviour {
 
     [Header("Двигать")]
     public bool isRun;
+
+    [Header("Имеет дополнительную жизнь")]
+    public bool isHasSecondLife;
+
+    [Header("Имеет бустер очков")]
+    public bool isHasScoreBooster;
+
+    [Header("Имеет бустер прыжка")]
+    public bool isHasJumpBooster;
+
+    [Header("Столкнулся с препятствием")]
+    public bool isHitAnObstacle;
+
+    [Header("Столкнулся с бустером")]
+    public bool isHasCollisionWithBooster;
+
+    [Header("Эффект бустера")]
+    public string playerEffect;
 
     [Header("Variables")]
     [SerializeField] float      m_maxSpeed = 4.5f;
@@ -14,8 +32,6 @@ public class PrototypeHeroDemo : MonoBehaviour {
     [SerializeField] GameObject m_RunStopDust;
     [SerializeField] GameObject m_JumpDust;
     [SerializeField] GameObject m_LandingDust;
-
-    [SerializeField] EnvironmentGenerator environmentGenerator;
 
     private Animator            m_animator;
     private Rigidbody2D         m_body2d;
@@ -80,11 +96,17 @@ public class PrototypeHeroDemo : MonoBehaviour {
 
         m_moving = isRun;
 
-        if(m_obstacleSensor.State())
+        if (m_obstacleSensor.isHasCollision)
         {
-            isRun =false;
-            environmentGenerator.isRun = false;
-            print("GAME OVER");
+            isHitAnObstacle = true;
+            m_obstacleSensor.isHasCollision = false;
+        }
+
+        if (m_obstacleSensor.isHasCollisionWithBooster)
+        {
+            isHasCollisionWithBooster = true;
+            m_obstacleSensor.isHasCollisionWithBooster = false;
+            playerEffect = m_obstacleSensor.playerEffect;
         }
 
         // Swap direction of sprite depending on move direction
@@ -142,6 +164,24 @@ public class PrototypeHeroDemo : MonoBehaviour {
         //Idle
         else
             m_animator.SetInteger("AnimState", 0);
+    }
+
+    public void Stop()
+    {
+        m_animator.enabled = false;
+        m_body2d.gravityScale = 0;
+        m_body2d.angularVelocity = 0f;
+        m_body2d.velocity = Vector3.zero;
+    }
+
+    public void SetSpeed(float value)
+    {
+        m_animator.speed = value;
+    }
+
+    public void setJumpForce(float value)
+    {
+        m_jumpForce = value;
     }
 
     // Function used to spawn a dust effect

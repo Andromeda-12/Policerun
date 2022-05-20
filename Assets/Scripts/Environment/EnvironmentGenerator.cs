@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +8,14 @@ public class EnvironmentGenerator : MonoBehaviour
     [Header("Препятствия")]
     public List<GameObject> prefabList = new List<GameObject>();
 
+    [Header("Бустеры")]
+    public List<GameObject> boostersList = new List<GameObject>();
+
     [Header("Двигать")]
     public bool isRun;
+
+    [Header("Шанс спавна бустеров")]
+    public int boosterSpawnChance;
 
     [Header("Все участки окружения дороги")]
     public GameObject[] Environments;
@@ -94,9 +99,10 @@ public class EnvironmentGenerator : MonoBehaviour
             Environments[currentEnvNumber].transform.localPosition = new Vector3(0f, 0f, 0f);
         }
 
+        if ((Random.Range(0, 100) < boosterSpawnChance) && isRun)
+            CreateBooster();
+
         Environments[currentEnvNumber].GetComponent<Environment>().number = currentEnvNumber;
-
-
 
         envNumbers[currentEnvNumber] = true;
         lastEnvNumber = currentEnvNumber;
@@ -129,6 +135,8 @@ public class EnvironmentGenerator : MonoBehaviour
                 Destroy(obstracles.transform.GetChild(j).gameObject);
             }
 
+            //var boosters = ReadyEnvironments[0].gameObject
+
             CreateObstracles(ReadyEnvironments[ReadyEnvironments.Count - 1]);
 
             ReadyEnvironments[0].transform.localPosition = waitingZone;
@@ -143,7 +151,7 @@ public class EnvironmentGenerator : MonoBehaviour
         var envPosition = environment.transform.position;
 
         var deltaX = Random.Range(-distanceBetweenEnvironments / 4, distanceBetweenEnvironments / 4);
-        var deltaY = Random.Range(0, 4);
+        var deltaY = 4;
         var position = new Vector3(envPosition.x + deltaX, envPosition.y + deltaY, envPosition.z);
 
         var obstracles = environment.gameObject.transform.Find("Obstracles");
@@ -154,5 +162,49 @@ public class EnvironmentGenerator : MonoBehaviour
     private GameObject GetRandomObstracle()
     {
         return prefabList[Random.Range(0, prefabList.Count)];
+    }
+
+    private GameObject GetRandomBooster()
+    {
+        return boostersList[Random.Range(0, boostersList.Count)];
+    }
+
+    public void DeleteObstacles()
+    {
+        foreach (var env in ReadyEnvironments)
+        {
+            var obstracles = env.gameObject.transform.Find("Obstracles");
+            for (int j = 0; j < obstracles.transform.childCount; j++)
+            {
+                Destroy(obstracles.transform.GetChild(j).gameObject);
+            }
+        }
+    }
+
+    public void CreateBooster()
+    {
+        GameObject environment = ReadyEnvironments[ReadyEnvironments.Count - 1];
+        GameObject booster = GetRandomBooster();
+        var envPosition = environment.transform.position;
+
+        var deltaX = Random.Range(-distanceBetweenEnvironments / 4, distanceBetweenEnvironments / 4);
+        var deltaY = Random.Range(0, 4);
+        var position = new Vector3(envPosition.x + deltaX, envPosition.y + deltaY, envPosition.z);
+        
+        var obj = Instantiate(booster, position, Quaternion.identity);
+        obj.tag = "Booster";
+        obj.transform.SetParent(environment.transform);
+    }
+
+    public void DeleteBoosters()
+    {
+        foreach (var env in ReadyEnvironments)
+        {
+            for (int i = 0; i < env.transform.childCount; i++)
+            {
+                if (env.transform.GetChild(i).tag == "Booster")
+                    Destroy(env.transform.GetChild(i).gameObject);
+            }
+        }
     }
 }
