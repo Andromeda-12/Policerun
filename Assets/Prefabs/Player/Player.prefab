@@ -70,6 +70,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a1535a4628fc5e42b443c9fcb1f6325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isHasCollision: 0
+  isHasCollisionWithBooster: 0
+  playerEffect: 
 --- !u!1 &1254912165905175345
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,13 +193,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRun: 0
+  isHasSecondLife: 0
+  isHasScoreBooster: 0
+  isHasJumpBooster: 0
+  isHitAnObstacle: 0
+  isHasCollisionWithBooster: 0
+  playerEffect: 
   m_maxSpeed: 4.5
   m_jumpForce: 7.5
   m_hideSword: 1
   m_RunStopDust: {fileID: 7310271610845027193, guid: 39afca3c109b26049a80bc07593eb271, type: 3}
   m_JumpDust: {fileID: 8935918012585647707, guid: 4a4123fbc8b39d441868897a71d2b2b1, type: 3}
   m_LandingDust: {fileID: 9076098953984712191, guid: 0b745be9abb3a6d4dadd8705950196d1, type: 3}
-  environmentGenerator: {fileID: 0}
 --- !u!95 &3764271992053789189
 Animator:
   serializedVersion: 3
@@ -256,7 +264,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 300ea1a5869382b43bf6149aba92c4db, type: 3}
+  m_Sprite: {fileID: -3556614177563570530, guid: bcb0fca8d08259f41be394f72f37fb10, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -304,8 +312,8 @@ BoxCollider2D:
   m_Offset: {x: -0.03125, y: 0.71875}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
-    oldSize: {x: 3.125, y: 2.5}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.18, y: 0.44}
     newSize: {x: 3.125, y: 2.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
