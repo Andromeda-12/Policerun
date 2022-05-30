@@ -18,7 +18,7 @@ public class FireBaseController : MonoBehaviour
             var score = player.score;
             if (DataHolder.Score >= 100000)
             {
-                DataHolder.CountGame = plays++; // опх опнунфдемхх хцпш сбекхвхбюел ецн явервхй
+                DataHolder.CountGame = ++plays; // опх опнунфдемхх хцпш сбекхвхбюел ецн явервхй
             }
             else if(DataHolder.Score < score)
             {
