@@ -1,6 +1,9 @@
+using Firebase.Database;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour
 {
@@ -10,7 +13,7 @@ public class GameLogic : MonoBehaviour
     [Header("Ãåíåðàòîð îêðóæåíèÿ")]
     public EnvironmentGenerator environmentGenerator;
 
-
+    //public FinalScreen
 
     [Header("Èãðîê")]
     public Player player;
@@ -19,9 +22,11 @@ public class GameLogic : MonoBehaviour
     private float scoreBoosterTimer;
     private float jumpBoosterTimer;
 
+    FireBaseController db;
     [ContextMenu("StartGame")]
     public void StartGame()
     {
+
         isGameRun = true;
         environmentGenerator.isRun = true;
         player.isRun = true;
@@ -33,10 +38,13 @@ public class GameLogic : MonoBehaviour
         isGameRun = false;
         environmentGenerator.isRun = false;
         player.isRun = false;
-
         player.Stop();
-
-        print("GAME OVER");
+        DataHolder.Score = scoreCounter.Score; // ÓÑÒÀÍÀÂËÈÂÀÅÌ ÑÊÎËÜÊÎ Î×ÊÎÂ ÍÀÁÐÀË ÈÃÐÎÊ
+        var obj = GameObject.Find("Canvas");
+        var childobj = obj.transform.Find("FinalScreen").gameObject;
+        childobj.SetActive(true);  // ÏÎÊÀÇÛÂÀÅÌ ÔÈÍÀËÜÍÛÉ ÝÊÐÀÍ
+        db.SaveData();  // ÑÎÕÐÀÍßÅÌ ÄÀÍÍÛÅ Â ÁÄ
+        enabled = false; // ÂÛÐÓÁÀÅÌ ÑÊÐÈÏÒ
     }
 
     private void FixedUpdate()
@@ -80,6 +88,7 @@ public class GameLogic : MonoBehaviour
 
             if (scoreCounter.Score >= 100000)
                 EndGame();
+
         }
         else
         {
@@ -111,7 +120,8 @@ public class GameLogic : MonoBehaviour
 
     private void CheckPlayerForCollisionWithBooster()
     {
-        if(player.isHasCollisionWithBooster) {
+        if (player.isHasCollisionWithBooster)
+        {
             player.isHasCollisionWithBooster = false;
             string effect = player.playerEffect;
 
@@ -144,5 +154,11 @@ public class GameLogic : MonoBehaviour
             player.isHasJumpBooster = false;
             player.setJumpForce(12);
         }
+    }
+    public void Start()
+    {
+        db = GetComponent<FireBaseController>();
+        db.dbRef = FirebaseDatabase.DefaultInstance;
+        StartGame();
     }
 }
