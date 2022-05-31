@@ -11,11 +11,20 @@ public class FireBaseController : MonoBehaviour
     public FirebaseDatabase dbRef;
     public void SaveData()
     {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            print("no internet");
+            return;
+        }
+
         if(DataHolder.players.Exists(p=> p.name == DataHolder.Name))  // еякх хцпнй сфе хцпюк б хцпс рн
         {
             var player = DataHolder.players.First(p => p.name == DataHolder.Name);
             var plays = player.plays;
             var score = player.score;
+
+            DataHolder.Score = score;
+
             if (DataHolder.Score >= 100000)
             {
                 DataHolder.CountGame = ++plays; // опх опнунфдемхх хцпш сбекхвхбюел ецн явервхй

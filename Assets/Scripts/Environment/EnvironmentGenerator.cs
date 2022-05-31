@@ -24,7 +24,7 @@ public class EnvironmentGenerator : MonoBehaviour
     [Header("Максимальная длина дороги")]
     public int maximumEnvironmentLength = 3;
     [Header("Дистанция между дорогами")]
-    public int distanceBetweenEnvironments = 10;
+    public float distanceBetweenEnvironments = 10;
     [Header("Скорость дороги")]
     public float speedEnv = 10;
     [Header("Позиция Х при которой удаляется дорога")]
@@ -147,16 +147,19 @@ public class EnvironmentGenerator : MonoBehaviour
 
     private void CreateObstracles(GameObject environment)
     {
-        GameObject prefab = GetRandomObstracle();
-        var envPosition = environment.transform.position;
+        if (Random.Range(0, 100) <= 80)
+        {
+            GameObject prefab = GetRandomObstracle();
+            var envPosition = environment.transform.position;
 
-        var deltaX = Random.Range(-distanceBetweenEnvironments / 4, distanceBetweenEnvironments / 4);
-        var deltaY = 4;
-        var position = new Vector3(envPosition.x + deltaX, envPosition.y + deltaY, envPosition.z);
+            var deltaX = Random.Range(-distanceBetweenEnvironments / 4, distanceBetweenEnvironments / 4);
+            var deltaY = Random.Range(0f, 3f);
+            var position = new Vector3(envPosition.x + deltaX, envPosition.y + deltaY, envPosition.z);
 
-        var obstracles = environment.gameObject.transform.Find("Obstracles");
-        var obj = Instantiate(prefab, position, Quaternion.identity);
-        obj.transform.SetParent(obstracles.transform);
+            var obstracles = environment.gameObject.transform.Find("Obstracles");
+            var obj = Instantiate(prefab, position, Quaternion.identity);
+            obj.transform.SetParent(obstracles.transform);
+        }
     }
 
     private GameObject GetRandomObstracle()
@@ -183,14 +186,24 @@ public class EnvironmentGenerator : MonoBehaviour
 
     public void CreateBooster()
     {
+        if (ReadyEnvironments.Count == 0)
+            return;
+
         GameObject environment = ReadyEnvironments[ReadyEnvironments.Count - 1];
+
+        for (int i = 0; i < environment.transform.childCount; i++)
+        {
+            if (environment.transform.GetChild(i).tag == "Booster") // если на участке дороги уже есть бустре
+                return;
+        }
+
         GameObject booster = GetRandomBooster();
         var envPosition = environment.transform.position;
 
         var deltaX = Random.Range(-distanceBetweenEnvironments / 4, distanceBetweenEnvironments / 4);
         var deltaY = Random.Range(0, 4);
         var position = new Vector3(envPosition.x + deltaX, envPosition.y + deltaY, envPosition.z);
-        
+
         var obj = Instantiate(booster, position, Quaternion.identity);
         obj.tag = "Booster";
         obj.transform.SetParent(environment.transform);

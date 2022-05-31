@@ -157,6 +157,19 @@ public class Player : MonoBehaviour {
             m_groundSensor.Disable(0.2f);
         }
 
+        else if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began && m_grounded && m_disableMovementTimer < 0.0f)
+            {
+                m_animator.SetTrigger("Jump");
+                m_grounded = false;
+                m_animator.SetBool("Grounded", m_grounded);
+                m_body2d.velocity = new Vector2(m_body2d.velocity.x, m_jumpForce);
+                m_groundSensor.Disable(0.2f);
+            }
+        }
+
         //Run
         else if(m_moving)
             m_animator.SetInteger("AnimState", 1);

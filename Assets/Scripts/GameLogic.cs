@@ -7,6 +7,10 @@ using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour
 {
+    public Text text1;
+    public Text text2;
+    public Text text3;
+
     [Header("Очки игрока")]
     public ScoreCounter scoreCounter;
 
@@ -23,10 +27,10 @@ public class GameLogic : MonoBehaviour
     private float jumpBoosterTimer;
 
     FireBaseController db;
+
     [ContextMenu("StartGame")]
     public void StartGame()
     {
-
         isGameRun = true;
         environmentGenerator.isRun = true;
         player.isRun = true;
@@ -59,17 +63,20 @@ public class GameLogic : MonoBehaviour
         bool isPlayerHitAnObstacle = CheckPlayerForCollision();
         if (isPlayerHitAnObstacle)
             EndGame();
-
     }
 
     private void CheckScore()
     {
+        if (scoreCounter.Score >= 100000)
+            EndGame();
+
         if (player.isHasScoreBooster && (Time.realtimeSinceStartup - scoreBoosterTimer > 5f))
         {
             player.isHasScoreBooster = false;
             scoreCounter.isScoreBooster = false;
-            environmentGenerator.speedEnv = 10;
+            environmentGenerator.speedEnv = 7;
             player.SetSpeed(1);
+            text1.text = string.Empty;
         }
 
         if (!player.isHasScoreBooster)
@@ -80,24 +87,22 @@ public class GameLogic : MonoBehaviour
             if (scoreCounter.Score > 1000)
                 scoreCounter.ScoreFactor = 3;
 
-            if (scoreCounter.Score > 10000)
+            if (scoreCounter.Score > 5000)
                 scoreCounter.ScoreFactor = 4;
 
-            if (scoreCounter.Score > 25000)
+            if (scoreCounter.Score > 10000)
                 scoreCounter.ScoreFactor = 5;
 
-            if (scoreCounter.Score >= 100000)
-                EndGame();
-
+            if (scoreCounter.Score > 20000)
+                scoreCounter.ScoreFactor = 6;
         }
         else
         {
             scoreCounter.ScoreFactor = 100;
             scoreCounter.isScoreBooster = true;
-            environmentGenerator.speedEnv = 15;
+            environmentGenerator.speedEnv = 9;
             player.SetSpeed(1.2f);
         }
-
     }
 
     private bool CheckPlayerForCollision()
@@ -108,6 +113,7 @@ public class GameLogic : MonoBehaviour
             {
                 player.isHitAnObstacle = false;
                 player.isHasSecondLife = false;
+                text2.text = string.Empty;
                 environmentGenerator.DeleteObstacles();
                 return false;
             }
@@ -128,19 +134,22 @@ public class GameLogic : MonoBehaviour
             if (effect == "SecondLife")
             {
                 player.isHasSecondLife = true;
+                text2.text = "Second life";
             }
 
             if (effect == "ScoreBooster")
             {
                 player.isHasScoreBooster = true;
                 scoreBoosterTimer = Time.realtimeSinceStartup;
+                text1.text = "x100";
             }
 
             if (effect == "JumpBooster")
             {
                 player.isHasJumpBooster = true;
                 jumpBoosterTimer = Time.realtimeSinceStartup;
-                player.setJumpForce(18);
+                player.setJumpForce(16);
+                text3.text = "Jump booster";
             }
 
             environmentGenerator.DeleteBoosters();
@@ -152,9 +161,11 @@ public class GameLogic : MonoBehaviour
         if (player.isHasJumpBooster && (Time.realtimeSinceStartup - jumpBoosterTimer > 5f))
         {
             player.isHasJumpBooster = false;
-            player.setJumpForce(12);
+            player.setJumpForce(11);
+            text3.text = string.Empty;
         }
     }
+
     public void Start()
     {
         db = GetComponent<FireBaseController>();
